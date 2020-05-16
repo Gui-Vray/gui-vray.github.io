@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<title>UCD Symphony Virtual Concerthall</title>
+		<link rel="stylesheet" href="main.css">
+		<style>
+			a {
+				color: #8ff;
+			}
+
+			#menu {
+				position: absolute;
+				bottom: 20px;
+				width: 100%;
+				text-align: center;
+			}
+
+			.element {
+				width: 120px;
+				height: 160px;
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.5);
+				border: 1px solid rgba(127,255,255,0.25);
+				font-family: Helvetica, sans-serif;
+				text-align: center;
+				line-height: normal;
+				cursor: default;
+			}
+
+			.element:hover {
+				box-shadow: 0px 0px 12px rgba(0,255,255,0.75);
+				border: 1px solid rgba(127,255,255,0.75);
+			}
+
+				.element .number {
+					position: absolute;
+					top: 20px;
+					right: 20px;
+					font-size: 12px;
+					color: rgba(127,255,255,0);
+				}
+
+				.element .symbol {
+					position: absolute;
+					top: 30px;
+					left: 0px;
+					right: 0px;
+					font-size: 60px;
+					font-weight: bold;
+					color: rgba(255,255,255,0.75);
+					text-shadow: 0 0 10px rgba(0,255,255,0.95);
+				}
+
+				.element .details {
+					position: absolute;
+					bottom: 7px;
+					left: 0px;
+					right: 0px;
+					font-size: 12px;
+					color: rgba(127,255,255,0.75);
+				}
+
+			button {
+				color: rgba(127,255,255,0.75);
+				background: transparent;
+				outline: 1px solid rgba(127,255,255,0.75);
+				border: 0px;
+				padding: 5px 10px;
+				cursor: pointer;
+			}
+
+			button:hover {
+				background-color: rgba(0,255,255,0.5);
+			}
+
+			button:active {
+				color: #000000;
+				background-color: rgba(0,255,255,0.75);
+			}
+		</style>
+	</head>
+	<body>
+
+		<div id="info"><a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> UCD Symphony Virtual Concerthall</div>
+		<div id="container"></div>
+		<div id="menu">
+			<button id="table">TABLE</button>
+			<button id="sphere">SPHERE</button>
+			<button id="helix">HELIX</button>
+			<button id="grid">GRID</button>
+		</div>
+
+		<script type="module">
+
+			import * as THREE from '../build/three.module.js';
+
+			import { TWEEN } from './jsm/libs/tween.module.min.js';
+			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
+
+			var table = [
+				"M°", "Conductor", "Ciaràn Crilly", 8, -.5,
+
+				"KM", "KonzertMeister", "Barry Kennedy", 10, 0,
+				"V1b", "Violin 1b", "Luke Kehoe-Roche", 10, 1,
+				"V1c", "Violin 1c", "Abbie Soon", 11, 0,
+				"V1d", "Violin 1d", "Cian Dwyer", 11, 1,
+				"V1e", "Violin 1e", "Hannah Reilly", 12, 0,
+				"V1f", "Violin 1f", "Eleanor Ronan", 12, 1,
+				"V1g", "Violin 1g", "Marie Therese Boland", 13, 0,
+				"V1h", "Violin 1h", "Abbie Sullivan", 13, 1,
+				"V1i", "Violin 1i", "Nicolas Hoischen", 14, 0,
+				"V1j", "Violin 1j", "Anna Walsh", 14, 1,
+				"V1k", "Violin 1k", "Jeanne Allain", 15, 0,
+				"V1l", "Violin 1l", "David McGauran", 15, 1,
+				"V1m", "Violin 1m", "Siobhan Downes", 16, 0,
+				"V1n", "Violin 1n", "Clara Webster", 16, 1,
+				"V1m", "Violin 1o", "Louis Bourke", 17, 0,
+				"V1n", "Violin 1p", "Aoife Kavanagh", 17, 1,
+				"V1m", "Violin 1q", "Charlotte Hertel", 18, 0,
+
+				"V2a", "Violin 2a", "Brigid Kemerer", 9, 2.5,
+				"V1b", "Violin 2b", "Meabh Ruane", 9, 3.5,
+				"V1c", "Violin 2c", "Emma Bergin", 10, 2.5,
+				"V1d", "Violin 2d", "Thea Harte", 10, 3.5,
+				"V1e", "Violin 2e", "Ciara O’Connor", 11, 2.5,
+				"V1f", "Violin 2f", "Caoimhe Campbell", 11, 3.5,
+				"V1g", "Violin 2g", "Michael Regan", 12, 2.5,
+				"V1h", "Violin 2h", "John Brennan", 12, 3.5,
+				"V1i", "Violin 2i", "Maia Matthews", 13, 2.5,
+				"V1j", "Violin 2j", "Koh Jia Chi", 13, 3.5,
+				"V1k", "Violin 2k", "Laura Bruen", 14, 2.5,
+				"V1l", "Violin 2l", "Suzannah Berke", 14, 3.5,
+				"V1m", "Violin 2m", "Claire Young", 15, 2.5,
+				"V1n", "Violin 2n", "Molly Monroy", 15, 3.5,
+				"V1k", "Violin 2o", "Dermot Edmondson", 16, 2.5,
+				"V1l", "Violin 2p", "Aisling Gouldson", 16, 3.5,
+				"V1m", "Violin 2q", "Sarah Murphy", 17, 2.5,
+				"V1n", "Violin 2r", "Anna Fay", 17, 3.5,
+				"V1m", "Violin 2s", "Kerri Ann Sutton", 18, 2.5,
+
+				"Vaa", "Viola a", "Sarah Dungan", 7, 2.5,
+				"Vab", "Viola b", "Ilona Adams", 7, 3.5,
+				"Vac", "Viola c", "Elizabeth O’Gorman", 6, 2.5,
+				"Vad", "Viola d", "Cliona Ní Chochlain", 6, 3.5,
+				"Vae", "Viola e", "Cian McBrearty", 5, 2.5,
+				"Vaf", "Viola f", "Meabh O’Reilly", 5, 3.5,
+				"Vag", "Viola g", "Sean Mulligan", 4, 2.5,
+				"Vah", "Viola h", "Eleanor Gaffney", 4, 3.5,
+				"Vai", "Viola i", "Name", 3, 2.5,
+				"Vaj", "Viola j", "Name", 3, 3.5,
+
+				"Vca", "Cello a", "Clodagh Reilly", 6, 0,
+				"Vcb", "Cello b", "Eoin Hammond", 7, 1,
+				"Vcc", "Cello c", "Isolde O’Loughlin", 5, 0,
+				"Vcd", "Cello d", "Leah Raggett", 5, 1,
+				"Vce", "Cello e", "Laoise Collins", 4, 0,
+				"Vcf", "Cello f", "Liam Sutherland", 4, 1,
+				"Vcg", "Cello g", "Aisling O’Connell", 3, 0,
+				"Vch", "Cello h", "Ella Brennan", 3, 1,
+				"Vci", "Cello i", "Name", 2, 0,
+				"Vcj", "Cello j", "Name", 2, 1,
+
+				"Cba", "Contrabass a", "Ritchie Burbridge", .5, 1.5,
+				"Cbb", "Contrabass b", "Naomi Whyte", 1, 2.5,
+				"Cbc", "Contrabass c", "Jennifer O’Brien", 0, 2.5,
+				"Cbd", "Contrabass d", "Donagh O’Callaghan", .5, 3.5,
+				"Cbe", "Contrabass e", "Alex Felle", 1, 4.5,
+
+				"Hp", "Harp", "Niamh O’Farrell", 18, 5,
+				"π", "Piano", "Alan Fagan", 17.5, 6,
+
+				"Fl1", "Flute 1", "Clodagh Curran", 15.5, 6,
+				"Fl2", "Flute 2", "Kevin Delahunty", 14.5, 6,
+				"Fl3", "Flute 3", "Darragh Montague", 13.5, 6,
+				"Picc", "Piccolo", "David Watters", 12.5, 6,
+
+				"Ob1", "Oboe 1", "Ciara Jones", 11, 6,
+				"Ob2", "Oboe 2", "Hannah Jacob", 10, 6,
+				"EH", "English Horn", "Caoimhe Tierney", 9, 6,
+
+				"Cl1", "Clarinet 1", "Niall Brennan", 7, 6,
+				"Cl2", "Clarinet 2", "Harry Kearns", 6, 6,
+				"bCl", "Bass Clarinet", "Aoibheann Power", 5, 6,
+
+				"Bs1", "Bassoon 1", "Parker Girod", 3.5, 6,
+				"Bs2", "Bassoon 2", "Joanne Gillen", 2.5, 6,
+				"cBs", "Contrabassoon", "Name", 1.5, 6,
+
+				"Hn1", "French Horn 1", "Laurel McEnaney", 15.5, 7.5,
+				"Hn2", "French Horn 2", "Jack Ó Muircheartaigh", 14.5, 7.5,
+				"Hn3", "French Horn 3", "Lilly Sandberger", 15.5, 8.5,
+				"Hn4", "French Horn 4", "Daniel White", 14.5, 8.5,
+
+				"Tp1", "Trumpet 1", "Henry Start", 13, 7.5,
+				"Tp2", "Trumpet 2", "Henry Cahill", 12, 7.5,
+				"Tp3", "Trumpet 3", "Ee Ann Ho", 11, 7.5,
+				"Tp4", "Trumpet 4", "Ben Graham", 10, 7.5,
+				"Tp5", "Trumpet 5", "Conor O’Shea", 9, 7.5,
+
+				"Tb1", "Trombone 1", "Ciara Lambkin", 7, 7.5,
+				"Tb2", "Trombone 2", "Andrea Clarke", 6, 7.5,
+				"Tb3", "Trombone 3", "Christopher McGuinness", 5, 7.5,
+				"bTb", "Bass Tombone", "Zhao Boyuan", 4, 7.5,
+
+				"Eu", "Euphonium", "Gerard Colman", 2.5, 7.5,
+				"Tba", "Bass Tuna", "Gearóid Lynch", 1.5, 7.5,
+
+				"Tmp", "Timpani", "Nicola Carrigan", 8, 9.5,
+				"Pc1", "Percussion 1", "Devin Rose McCarten ", 6, 9.5,
+				"Pc2", "Percussion 2", "Hugh Rooney ", 5, 9.5,
+				"Pc3", "Percussion 3", "Till Weyers", 4, 9.5,
+				"Pc4", "Percussion 4", "Maeve O’Hara", 3, 9.5,
+				
+			];
+
+			var camera, scene, renderer;
+			var controls;
+
+			var objects = [];
+			var targets = { table: [], sphere: [], helix: [], grid: [] };
+
+			init();
+			animate();
+
+			function init() {
+
+				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 )
+				camera.position.z = 2500;
+				camera.position.y -= 800;
+
+
+				scene = new THREE.Scene();
+
+				// SETUP Table
+				for ( var i = 0; i < table.length; i += 5 ) {
+
+					var element = document.createElement( 'div' );
+					element.className = 'element';
+					element.style.backgroundColor = 'rgba(0,127,127,' + ( Math.random() * 0.5 + 0.25 ) + ')';
+
+					var number = document.createElement( 'div' );
+					number.className = 'number';
+					number.textContent = ( i / 5 ) + 1;
+					element.appendChild( number );
+
+					var symbol = document.createElement( 'div' );
+					symbol.className = 'symbol';
+					symbol.textContent = table[ i ];
+					element.appendChild( symbol );
+
+					var details = document.createElement( 'div' );
+					details.className = 'details';
+					details.innerHTML = table[ i + 1 ] + '<br>' + '<em>' + table[ i + 2 ] + '</em>';
+					element.appendChild( details );
+
+					var object = new CSS3DObject( element );
+					object.position.x = Math.random() * 4000 - 2000;
+					object.position.y = Math.random() * 4000 - 2000;
+					object.position.z = Math.random() * 4000 - 2000;
+					scene.add( object );
+
+					objects.push( object );
+
+					//
+
+					var object = new THREE.Object3D();
+					object.position.x = ( table[ i + 3 ] * 140 ) - 1330;
+					object.position.y = - ( table[ i + 4 ] * 180 ) + 990;
+
+					targets.table.push( object );
+
+				}
+
+				// SETUP Sphere
+				var vector = new THREE.Vector3();
+				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+					var phi = Math.acos( - 1 + ( 2 * i ) / l );
+					var theta = Math.sqrt( l * Math.PI ) * phi;
+
+					var object = new THREE.Object3D();
+
+					object.position.setFromSphericalCoords( 800, phi, theta );
+
+					vector.copy( object.position ).multiplyScalar( 2 );
+
+					// object.lookAt( vector );
+					object.lookAt( camera.position );
+
+
+					targets.sphere.push( object );
+
+				}
+
+				// SETUP Helix
+
+				var vector = new THREE.Vector3();
+
+				for ( var i = 0, l = objects.length; i < l; i ++ ) {
+
+					var theta = i * 0.175 + Math.PI;
+					var y = - ( i * 8 ) + 450;
+
+					var object = new THREE.Object3D();
+
+					object.position.setFromCylindricalCoords( 900, theta, y );
+
+					vector.x = object.position.x * 2;
+					vector.y = object.position.y;
+					vector.z = object.position.z * 2;
+
+					// object.lookAt( vector );
+					object.lookAt( camera.position );
+
+
+					targets.helix.push( object );
+
+				}
+
+				// grid
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = new THREE.Object3D();
+
+					object.position.x = ( ( i % 5 ) * 400 ) - 800;
+					object.position.y = ( - ( Math.floor( i / 5 ) % 5 ) * 400 ) + 800;
+					object.position.z = ( Math.floor( i / 25 ) ) * 1000 - 2000;
+
+					targets.grid.push( object );
+
+					object.lookAt( camera.position );
+
+				}
+
+				//
+
+				renderer = new CSS3DRenderer();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+				document.getElementById( 'container' ).appendChild( renderer.domElement );
+
+				//
+
+				controls = new TrackballControls( camera, renderer.domElement );
+				controls.minDistance = 500;
+				controls.maxDistance = 6000;
+				controls.addEventListener( 'change', render );
+
+				var button = document.getElementById( 'table' );
+				button.addEventListener( 'click', function () {
+
+					transform( targets.table, 2000 );
+
+				}, false );
+
+				var button = document.getElementById( 'sphere' );
+				button.addEventListener( 'click', function () {
+
+					transform( targets.sphere, 2000 );
+
+				}, false );
+
+				var button = document.getElementById( 'helix' );
+				button.addEventListener( 'click', function () {
+
+					transform( targets.helix, 2000 );
+
+				}, false );
+
+				var button = document.getElementById( 'grid' );
+				button.addEventListener( 'click', function () {
+
+					transform( targets.grid, 2000 );
+
+				}, false );
+
+				transform( targets.table, 2000 );
+
+				//
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+			}
+
+			function transform( targets, duration ) {
+
+				TWEEN.removeAll();
+
+				for ( var i = 0; i < objects.length; i ++ ) {
+
+					var object = objects[ i ];
+					var target = targets[ i ];
+
+					new TWEEN.Tween( object.position )
+						.to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
+						.easing( TWEEN.Easing.Exponential.InOut )
+						.start();
+
+					new TWEEN.Tween( object.rotation )
+						.to( { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration )
+						.easing( TWEEN.Easing.Exponential.InOut )
+						.start();
+
+				}
+
+				new TWEEN.Tween( this )
+					.to( {}, duration * 2 )
+					.onUpdate( render )
+					.start();
+
+			}
+
+			function onWindowResize() {
+
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+
+				renderer.setSize( window.innerWidth, window.innerHeight );
+
+				render();
+
+			}
+
+			function animate() {
+
+				requestAnimationFrame( animate );
+
+				TWEEN.update();
+
+				controls.update();
+				sphere.rotation.y += 0.01;
+
+			}
+
+			function render() {
+
+				camera.updateProjectionMatrix();
+				renderer.render( scene, camera );
+
+			}
+
+		</script>
+	</body>
+</html>
