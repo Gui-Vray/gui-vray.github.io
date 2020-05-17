@@ -97,6 +97,7 @@
 
 			import { TWEEN } from './jsm/libs/tween.module.min.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
+			import { OrbitControls } from './jsm/controls/OrbitControls.js';
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			var table = [
@@ -226,12 +227,29 @@
 
 			function init() {
 
-				camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 10000 )
-				camera.position.z = 2500;
-				camera.position.y -= 800;
+				// Camera
+				camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 1, 10000 )
+				camera.position.z = 1500;
+				camera.position.y = -100;
 
-
+				// Scene
 				scene = new THREE.Scene();
+
+				// AudioListener
+				var listener = new THREE.AudioListener();
+				camera.add( listener );
+
+				// Global audio source
+				var sound = new THREE.Audio( listener );
+
+				// Audio object buffer and sound source
+				var audioLoader = new THREE.AudioLoader();
+				audioLoader.load( 'audio/NUWA_UCD-russianFestival.ogg', function( buffer ) {
+					sound.setBuffer( buffer );
+					sound.setLoop( true );
+					sound.setVolume( 0.5 );
+					sound.play();
+				});
 
 				// SETUP Table
 				for ( var i = 0; i < table.length; i += 5 ) {
@@ -314,12 +332,11 @@
 					// object.lookAt( vector );
 					object.lookAt( camera.position );
 
-
 					targets.helix.push( object );
 
 				}
 
-				// grid
+				// SETUP grid
 
 				for ( var i = 0; i < objects.length; i ++ ) {
 
@@ -344,14 +361,19 @@
 				//
 
 				controls = new TrackballControls( camera, renderer.domElement );
-				controls.minDistance = 500;
+				controls.minDistance = 0;
 				controls.maxDistance = 6000;
+				controls.rotateSpeed = 1.0;
+				controls.zoomSpeed = 1.2;
+				controls.panSpeed = 0.8;
 				controls.addEventListener( 'change', render );
 
 				var button = document.getElementById( 'table' );
 				button.addEventListener( 'click', function () {
 
 					transform( targets.table, 2000 );
+					// camera.position.z = 1500;
+					// camera.position.y = -100;
 
 				}, false );
 
@@ -359,6 +381,8 @@
 				button.addEventListener( 'click', function () {
 
 					transform( targets.sphere, 2000 );
+					// camera.position.z = 0;
+					// camera.position.y = 0;
 
 				}, false );
 
@@ -366,6 +390,8 @@
 				button.addEventListener( 'click', function () {
 
 					transform( targets.helix, 2000 );
+					// camera.position.z = 0;
+					// camera.position.y = 0;
 
 				}, false );
 
@@ -373,6 +399,8 @@
 				button.addEventListener( 'click', function () {
 
 					transform( targets.grid, 2000 );
+					// camera.position.z = 2500 ;
+					// camera.position.y = 0;
 
 				}, false );
 
@@ -412,6 +440,7 @@
 
 			}
 
+
 			function onWindowResize() {
 
 				camera.aspect = window.innerWidth / window.innerHeight;
@@ -430,7 +459,6 @@
 				TWEEN.update();
 
 				controls.update();
-				sphere.rotation.y += 0.01;
 
 			}
 
