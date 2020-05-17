@@ -98,6 +98,7 @@
 			import { TWEEN } from './jsm/libs/tween.module.min.js';
 			import { TrackballControls } from './jsm/controls/TrackballControls.js';
 			import { OrbitControls } from './jsm/controls/OrbitControls.js';
+			// import { Stats } from './jsm/libs/stats.module.js';
 			import { CSS3DRenderer, CSS3DObject } from './jsm/renderers/CSS3DRenderer.js';
 
 			var table = [
@@ -216,7 +217,7 @@
 				
 			];
 
-			var camera, scene, renderer;
+			var camera, scene, renderer, stats;
 			var controls;
 
 			var objects = [];
@@ -360,6 +361,11 @@
 
 				//
 
+				// stats = new Stats();
+				// document.getElementById( 'container' ).appendChild( stats.dom );
+
+				//
+
 				controls = new TrackballControls( camera, renderer.domElement );
 				controls.minDistance = 0;
 				controls.maxDistance = 6000;
@@ -457,8 +463,8 @@
 				requestAnimationFrame( animate );
 
 				TWEEN.update();
-
 				controls.update();
+				// stats.update();
 
 			}
 
